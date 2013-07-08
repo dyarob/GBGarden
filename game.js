@@ -24,11 +24,11 @@ c.height = height;
 // ===== OBJECTS =====
 // === Items ===
 function Item(position) {
+
+	// --- attributes ---
 	this.position = position;
-	
 	this.img = new Image();
 	this.img.src = "item1.png";
-
 	this.width = 32; //width of the single frame
 	this.height = 32; //height of the single frame
 	this.offset = 16;
@@ -48,9 +48,27 @@ var curItemId = 100;	// 100 = no item selected
 // === Pots ===
 // --- Constructor ---
 function Pot(position) {
+
+	// --- attributes ---
 	this.position = position;
+	this.crop = 100;	// 100 = nothing
+	this.signPosition = [this.position[0] - 16, this.position[1] - 10];
 	
-	this.crop = 0;
+	// --- methods ---
+	this.setCrop = function(id) {
+		this.crop = id;
+	}
+	
+	this.drawSign = function() {
+		if(this.crop != 100) {
+			try {
+				ctx.drawImage(items[0].img, 
+							0, 0, items[0].width, items[0].height,
+							this.signPosition[0], this.signPosition[1] + items[0].offset, 
+							items[0].width, items[0].height);
+			} catch (e) {}
+		}
+	}
 }
 var pots = [new Pot([25,190]),new Pot([80,222]),
 			new Pot([130,212]),new Pot([160, 242]),
@@ -64,7 +82,6 @@ var pots = [new Pot([25,190]),new Pot([80,222]),
 // --- Constructor ---
 function Button(position) {
 	this.position = position;
-	
 }
 var itemButton = new Button([56,0]);
 // ==========
@@ -216,27 +233,37 @@ window.addEventListener('keydown', function(event) {
 	
 	// --- A ---
 	case 96: // numpad 0
-		if(cursor.context == itemsMenuCTX) {
+		if(cursor.context == itemsMenuCTX) { // in the item panel
 			// calculation of the desired id based on the position of the cursor
 			curItemId = cursor.context.pMax[0] * cursor.context.pId[1]
-						 + (cursor.context.pId[0] +1);
+						 + cursor.context.pId[0];
 			cursor.context = gardenCTX;
 			cursor.context.pId = [0,1];
 		}
-		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) {
+		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
 			cursor.context = itemsMenuCTX;
+		}
+		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId != 100) { 
+																			// on a pot with an item
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(curItemId);	// Plant!
+			curItemId = 100;	// deselect current item
 		}
 	break;
 	case 188: // ,
-		if(cursor.context == itemsMenuCTX) {
+		if(cursor.context == itemsMenuCTX) { // in the item panel
 			// calculation of the desired id based on the position of the cursor
 			curItemId = cursor.context.pMax[0] * cursor.context.pId[1]
-						 + (cursor.context.pId[0] +1);
+						 + cursor.context.pId[0];
 			cursor.context = gardenCTX;
 			cursor.context.pId = [0,1];
 		}
-		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) {
+		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
 			cursor.context = itemsMenuCTX;
+		}
+		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId != 100) { 
+																			// on a pot with an item
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(curItemId);	// Plant!
+			curItemId = 100;	// deselect current item
 		}
 	break;
 
@@ -282,6 +309,12 @@ var drawMENU = function(){
 		ctx.drawImage(MENUimg, 0, 0, 320, 288, 0, 0, 320, 288);
 	} catch (e) {}
 }
+var drawPOTS = function(){
+	var i;
+	for(i=0; i<pots.length; ++i) {
+		pots[i].drawSign();
+	}
+}
 // ==========
 
 
@@ -289,9 +322,13 @@ var drawMENU = function(){
 
 // === Main loop ===
 var GameLoop = function(){
+	// scenery
 	drawBG();
-	if(cursor.context == itemsMenuCTX)
+	drawPOTS();
+	// overlay
+	if(cursor.context == itemsMenuCTX) {
 		drawMENU();
+	}
 	cursor.context.setPosition();
     cursor.draw();
 	gLoop = setTimeout(GameLoop, 100/50);
