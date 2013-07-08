@@ -47,10 +47,11 @@ var curItemId = 100;	// 100 = no item selected
 
 // === Pots ===
 // --- Constructor ---
-function Pot(position) {
+function Pot(position, size) {
 
 	// --- attributes ---
 	this.position = position;
+	this.size = size; // 1 = small (1 tile wide); 2 = medium (2t); 3 = big (3t)
 	this.crop = 100;	// 100 = nothing
 	this.signPosition = [this.position[0] - 16, this.position[1] - 10];
 	
