@@ -21,18 +21,69 @@ c.height = height;
 
 
 
+// ===== OBJECTS =====
+// === Items ===
+function Item(position) {
+	this.position = position;
+	
+	this.img = new Image();
+	this.img.src = "item1.png";
+
+	this.width = 32; //width of the single frame
+	this.height = 32; //height of the single frame
+	this.offset = 16;
+}
+
+var items = [new Item([70,44]),new Item([70,92]),new Item([70,140]),new Item([70,188]),
+			new Item([118,44]),new Item([118,92]),new Item([118,140]),new Item([118,188]),
+			new Item([166,44]),new Item([166,92]),new Item([166,140]),new Item([166,188]),
+			new Item([214,44]),new Item([214,92]),new Item([214,140]),new Item([214,188]),
+			new Item([262,44]),new Item([262,92]),new Item([262,140]),new Item([262,188])]
+			
+var curItemId = 100;	// 100 = no item selected
+// ==========
+
+
+
+// === Pots ===
+// --- Constructor ---
+function Pot(position) {
+	this.position = position;
+	
+	this.crop = 0;
+}
+var pots = [new Pot([25,190]),new Pot([80,222]),
+			new Pot([130,212]),new Pot([160, 242]),
+			new Pot([198, 242]),new Pot([244, 224]),
+			new Pot([292, 210])]
+// ==========
+
+
+
+// === Buttons ===
+// --- Constructor ---
+function Button(position) {
+	this.position = position;
+	
+}
+var itemButton = new Button([56,0]);
+// ==========
+// ===============
+
+
+
 
 // === Cursor contexts ===
 var gardenCTX = new (function(){
 	this.ptab = [
 				// buttons, pots
-				[[56,0],[25,190]],
-				[[56,0],[80,222]],
-				[[56,0],[130,212]],
-				[[56,0],[160, 242]],
-				[[56,0],[198, 242]],
-				[[56,0],[244, 224]],
-				[[56,0],[292, 210]]];
+				[itemButton, pots[0]],
+				[itemButton, pots[1]],
+				[itemButton, pots[2]],
+				[itemButton, pots[3]],
+				[itemButton, pots[4]],
+				[itemButton, pots[5]],
+				[itemButton, pots[6]]];
 	this.pId = [0,1];
 	this.pMax = [6,1];
 
@@ -41,8 +92,8 @@ var gardenCTX = new (function(){
 	
 	// --- methods ---
 	this.setPosition = function(){
-		this.X = this.ptab[this.pId[0]][this.pId[1]][0];
-		this.Y = this.ptab[this.pId[0]][this.pId[1]][1];
+		this.X = (this.ptab[this.pId[0]][this.pId[1]]).position[0];
+		this.Y = (this.ptab[this.pId[0]][this.pId[1]]).position[1];
 	}
 })();
 
@@ -50,15 +101,15 @@ var gardenCTX = new (function(){
 var itemsMenuCTX = new (function(){
 	this.ptab = [
 				// colonne 1
-				[[70,44],[70,92],[70,140],[70,188]],
+				[items[0],items[1],items[2],items[3]],
 				// colonne 2
-				[[118,44],[118,92],[118,140],[118,188]],
+				[items[4],items[5],items[6],items[7]],
 				// colonne 3
-				[[166,44],[166,92],[166,140],[166,188]],
+				[items[8],items[9],items[10],items[11]],
 				// colonne 4
-				[[214,44],[214,92],[214,140],[214,188]],
+				[items[12],items[13],items[14],items[15]],
 				// colonne 5
-				[[262,44],[262,92],[262,140],[262,188]]];
+				[items[16],items[17],items[18],items[20]]];
 	this.pId = [0,0];
 	this.pMax = [4,3];
 
@@ -67,8 +118,8 @@ var itemsMenuCTX = new (function(){
 	
 	// --- methods ---
 	this.setPosition = function(){
-		this.X = this.ptab[this.pId[0]][this.pId[1]][0];
-		this.Y = this.ptab[this.pId[0]][this.pId[1]][1];
+		this.X = this.ptab[this.pId[0]][this.pId[1]].position[0];
+		this.Y = this.ptab[this.pId[0]][this.pId[1]].position[1];
 	}
 })();
 // ==========
@@ -87,9 +138,17 @@ var cursor = new (function(){
 
 	this.draw = function(){
 		try {
-			ctx.drawImage(items[curItemId].img, 
-						  0, 0, items[curItemId].width, items[curItemId].height,
-						  this.context.X, this.context.Y - items[curItemId].offset, items[curItemId].width, items[curItemId].height);
+			if(curItemId == 100)
+				ctx.drawImage(this.img, 
+							0, 0, this.width, this.height,
+							this.context.X, this.context.Y - this.offset, 
+							this.width, this.height);
+			else {
+				ctx.drawImage(items[curItemId].img, 
+							0, 0, items[curItemId].width, items[curItemId].height,
+							this.context.X, this.context.Y - items[curItemId].offset, 
+							items[curItemId].width, items[curItemId].height);
+			}
 	//cutting source image and pasting it into destination one, drawImage(Image Object, source X, source Y, source Width, source Height, destination X (X position), destination Y (Y position), Destination width, Destination height)
 		} catch (e) {
 	//sometimes, if character's image is too big and will not load until the drawing of the first frame, Javascript will throws error and stop executing everything. To avoid this we have to catch an error and retry painting in another frame. It is invisible for the user with 50 frames per second.
@@ -97,24 +156,7 @@ var cursor = new (function(){
 	}
 })();
 // ==========
-
-
-
-
-// === Items ===
-var item1 = new (function(){
-	this.img = new Image();
-	this.img.src = "item1.png";
-
-	this.width = 32; //width of the single frame
-	this.height = 32; //height of the single frame
-	this.offset = 16;
-})();
-
-var items = [cursor, item1];
-
-var curItemId = 0;	// 0 = no item selected
-// ==========
+cursor.context.setPosition;
 
 
 
@@ -200,16 +242,16 @@ window.addEventListener('keydown', function(event) {
 
 	// --- B ---
 	case 110: // numpad .
-		if(curItemId != 0) {
-			curItemId = 0;	// deselect current item
+		if(curItemId != 100) {
+			curItemId = 100;	// deselect current item
 		}
 		else if(cursor.context == itemsMenuCTX) {
 			cursor.context = gardenCTX;	// exit item menu
 		}
 	break;
 	case 190: // period .
-		if(curItemId != 0) {
-			curItemId = 0;	// deselect current item
+		if(curItemId != 100) {
+			curItemId = 100;	// deselect current item
 		}
 		else if(cursor.context == itemsMenuCTX) {
 			cursor.context = gardenCTX;	// exit item menu
