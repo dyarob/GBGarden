@@ -22,7 +22,18 @@ c.height = height;
 
 
 // ===== OBJECTS =====
-// === Items ===
+
+// === Buttons ===
+// --- Constructor ---
+function Button(position) {
+	this.position = position;
+}
+var itemButton = new Button([56,0]);
+// ==========
+
+
+
+// === ITEMS ===
 function Item(position) {
 
 	// --- attributes ---
@@ -32,7 +43,20 @@ function Item(position) {
 	this.width = 32; //width of the single frame
 	this.height = 32; //height of the single frame
 	this.offset = 16;
+	// - Growth attributes -
+	this.mature = 0;
+	this.maxSize = 4;
+	this.stalkSPRT = new Image();
+	this.stalkSPRT.src = "item1_stalk.png";	// let's assume it's 16*16
+	
+	// --- methods ---
+	this.sow = function() {	// semer
+		// must make a small sprout appear
+		
+	}
 }
+
+//var item1 = new Item([70,44]);
 
 var items = [new Item([70,44]),new Item([70,92]),new Item([70,140]),new Item([70,188]),
 			new Item([118,44]),new Item([118,92]),new Item([118,140]),new Item([118,188]),
@@ -45,7 +69,7 @@ var curItemId = 100;	// 100 = no item selected
 
 
 
-// === Pots ===
+// === POTS ===
 // --- Constructor ---
 function Pot(position, size) {
 
@@ -53,11 +77,15 @@ function Pot(position, size) {
 	this.position = position;
 	this.size = size; // 1 = small (1 tile wide); 2 = medium (2t); 3 = big (3t)
 	this.crop = 100;	// 100 = nothing
+	this.crop2 = new Crop(this, items[0]);	
 	this.signPosition = [this.position[0] - 16, this.position[1] - 10];
 	
 	// --- methods ---
 	this.setCrop = function(id) {
 		this.crop = id;
+	}
+	this.setCrop2 = function(crop) {
+		this.crop2 = crop;
 	}
 	
 	this.drawSign = function() {
@@ -79,12 +107,46 @@ var pots = [new Pot([25,190]),new Pot([80,222]),
 
 
 
-// === Buttons ===
+// === CROPS ===
 // --- Constructor ---
-function Button(position) {
-	this.position = position;
+function Crop(pot, item) {
+	// --- Attributes ---
+	this.pot = pot;	// pot of the plant (for position and pot size)
+	this.item = item;	// from what seed is it (contain the growth algorithm and sprites etc)
+	// - State save -
+	// LIST of plant segments with positions and sprites
+	this.saveState = [];
+	
+	// --- Methods ---
+	this.sprout = function() {
+		// must make a small sprout appear
+		this.saveState.push(new Stalk(this.pot.position, item.stalkSPRT));
+	}
+	this.grow = function() {	// repeat until full growth (maxSize times)
+		// grow the plant by one step
+	}
+	this.draw = function() {	// to draw AFTER the pots (no risks of drawing above the pot)
+		var i;
+		for(i=0; i<this.saveState.length; ++i) {
+			this.saveState[i].draw();
+		}
+	}
 }
-var itemButton = new Button([56,0]);
+
+// --- Stalk ---
+function Stalk(position, img) {	// to add later: sprite id for plants with more than just one sprite
+	this.position = position;
+	this.img = img;
+	
+	this.draw = function() {
+		try {
+			ctx.drawImage(this.img, 
+						0, 0, 16, 16,
+						this.position[0]-8, this.position[1]-8, 
+						16, 16);
+		} catch (e) {}
+	}
+}
 // ==========
 // ===============
 
@@ -244,9 +306,18 @@ window.addEventListener('keydown', function(event) {
 		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
 			cursor.context = itemsMenuCTX;
 		}
+		//else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId == 100) { 
+		//																	// on a pot without an item
+		//	cursor.context = itemsMenuCTX;
+		//}
 		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId != 100) { 
 																			// on a pot with an item
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(curItemId);	// Plant!
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(curItemId);	
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop2(
+						new Crop(cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]], 
+						items[curItemId]));	
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.sprout();
+																			// Plant!
 			curItemId = 100;	// deselect current item
 		}
 	break;
@@ -316,6 +387,14 @@ var drawPOTS = function(){
 		pots[i].drawSign();
 	}
 }
+var drawPLANTS = function(){
+	var i;
+	for(i=0; i<pots.length; ++i) {
+		if(pots[i].crop != 100) {
+			pots[i].crop2.draw();
+		}
+	}
+}
 // ==========
 
 
@@ -326,6 +405,7 @@ var GameLoop = function(){
 	// scenery
 	drawBG();
 	drawPOTS();
+	drawPLANTS();
 	// overlay
 	if(cursor.context == itemsMenuCTX) {
 		drawMENU();
