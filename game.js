@@ -43,11 +43,13 @@ function Item(position) {
 	this.width = 32; //width of the single frame
 	this.height = 32; //height of the single frame
 	this.offset = 16;
+	
 	// - Growth attributes -
 	this.mature = 0;
 	this.maxSize = 4;
 	this.stalkSPRT = new Image();
 	this.stalkSPRT.src = "item1_stalk.png";	// let's assume it's 16*16
+	this.steptime = 400;
 	
 	// --- methods ---
 	this.sow = function() {	// semer
@@ -77,7 +79,7 @@ function Pot(position, size) {
 	this.position = position;
 	this.size = size; // 1 = small (1 tile wide); 2 = medium (2t); 3 = big (3t)
 	this.crop = 100;	// 100 = nothing
-	this.crop2 = new Crop(this, items[0]);	
+	this.crop2;	
 	this.signPosition = [this.position[0] - 16, this.position[1] - 10];
 	
 	// --- methods ---
@@ -110,22 +112,43 @@ var pots = [new Pot([25,190]),new Pot([80,222]),
 // === CROPS ===
 // --- Constructor ---
 function Crop(pot, item) {
+
 	// --- Attributes ---
 	this.pot = pot;	// pot of the plant (for position and pot size)
 	this.item = item;	// from what seed is it (contain the growth algorithm and sprites etc)
-	// - State save -
-	// LIST of plant segments with positions and sprites
-	this.saveState = [];
+	this.saveState = [];	// - State save = array list of plant segments with positions and sprites
+	
+	// - Growth attributes -
+	this.timer = 0;
+	this.lastUpdate = Date.now();
+	this.step = 0;
 	
 	// --- Methods ---
-	this.sprout = function() {
-		// must make a small sprout appear
+	this.sprout = function() {	// must make a small sprout appear
 		this.saveState.push(new Stalk(this.pot.position, item.stalkSPRT));
 	}
+	
 	this.grow = function() {	// repeat until full growth (maxSize times)
-		// grow the plant by one step
+		if(this.step < this.item.maxSize) {
+			this.timer += (Date.now() - this.lastUpdate);	// timer increment
+			this.lastUpdate = Date.now();
+			
+			if(this.timer >= this.item.steptime) {
+				this.timer = 0;
+				this.growOneStep();
+			}
+		}
 	}
-	this.draw = function() {	// to draw AFTER the pots (no risks of drawing above the pot)
+	
+	this.growOneStep = function() {	// grow the plant by one step
+		var l = this.saveState.length;
+		this.saveState.push(new Stalk(
+						[this.saveState[l-1].position[0] + 2*((~~(Math.random()*3))-1), this.saveState[l-1].position[1]-16],
+						this.item.stalkSPRT));
+		++this.step;
+	}
+	
+	this.draw = function() {	// to draw BEFORE the pots (no risks of drawing above the pot)
 		var i;
 		for(i=0; i<this.saveState.length; ++i) {
 			this.saveState[i].draw();
@@ -145,6 +168,16 @@ function Stalk(position, img) {	// to add later: sprite id for plants with more 
 						this.position[0]-8, this.position[1]-8, 
 						16, 16);
 		} catch (e) {}
+	}
+}
+
+// --- GROW ---
+var grow = function() {
+	var i;
+	for(i=0; i<pots.length; ++i) {
+		if(pots[i].crop2) {
+			pots[i].crop2.grow();
+		}
 	}
 }
 // ==========
@@ -402,10 +435,14 @@ var drawPLANTS = function(){
 
 // === Main loop ===
 var GameLoop = function(){
+	// processing
+	grow();
+
 	// scenery
 	drawBG();
 	drawPOTS();
 	drawPLANTS();
+	
 	// overlay
 	if(cursor.context == itemsMenuCTX) {
 		drawMENU();
