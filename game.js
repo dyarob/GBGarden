@@ -365,9 +365,18 @@ window.addEventListener('keydown', function(event) {
 		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
 			cursor.context = itemsMenuCTX;
 		}
+		//else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId == 100) { 
+		//																	// on a pot without an item
+		//	cursor.context = itemsMenuCTX;
+		//}
 		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId != 100) { 
 																			// on a pot with an item
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(curItemId);	// Plant!
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(curItemId);	
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop2(
+						new Crop(cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]], 
+						items[curItemId]));	
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.sprout();
+																			// Plant!
 			curItemId = 100;	// deselect current item
 		}
 	break;
