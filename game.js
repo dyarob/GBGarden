@@ -46,7 +46,7 @@ function Item(position) {
 	
 	// - Growth attributes -
 	this.mature = 0;
-	this.maxSize = 4;
+	this.maxSize = 10;
 	this.stalkSPRT = new Image();
 	this.stalkSPRT.src = "item1_stalk.png";	// let's assume it's 16*16
 	this.steptime = 400;
@@ -101,10 +101,10 @@ function Pot(position, size) {
 		}
 	}
 }
-var pots = [new Pot([25,190]),new Pot([80,222]),
-			new Pot([130,212]),new Pot([160, 242]),
-			new Pot([198, 242]),new Pot([244, 224]),
-			new Pot([292, 210])]
+var pots = [new Pot([25,190], 3),new Pot([80,222], 1),
+			new Pot([130,212], 2),new Pot([160, 242], 1),
+			new Pot([198, 242], 1),new Pot([244, 224], 2),
+			new Pot([292, 210], 2)]
 // ==========
 
 
@@ -122,14 +122,21 @@ function Crop(pot, item) {
 	this.timer = 0;
 	this.lastUpdate = Date.now();
 	this.step = 0;
+	this.maxstep = 16 + 8 * Math.pow(this.pot.size, 2);	// this.item.maxSize * this.pot.size doesn't work
 	
 	// --- Methods ---
 	this.sprout = function() {	// must make a small sprout appear
-		this.saveState.push(new Stalk(this.pot.position, this.item.stalkSPRT));
+		this.saveState.push(new Stalk([this.pot.position[0] + 2*(~~(Math.random()*9*this.pot.size -(9*this.pot.size)/2)), 
+										this.pot.position[1] + 2*((~~(Math.random()*6))-1)],
+									  this.item.stalkSPRT));
+	}
+	this.sproutAt = function(position) {	// must make a small sprout appear at a given position
+		this.saveState.push(new Stalk( position,
+									  this.item.stalkSPRT));
 	}
 	
 	this.grow = function() {	// repeat until full growth (maxSize times)
-		if(this.step < this.item.maxSize) {
+		if(this.step < this.maxstep) {
 			this.timer += (Date.now() - this.lastUpdate);	// timer increment
 			this.lastUpdate = Date.now();
 			
@@ -141,12 +148,23 @@ function Crop(pot, item) {
 	}
 	
 	this.growOneStep = function() {	// grow the plant by one step
-		//var l = this.saveState.length;
-		//this.saveState.push(new Stalk(
-		//				[this.saveState[l-1].position[0] + 2*((~~(Math.random()*3))-1), 
-		//				this.saveState[l-1].position[1]-16],
-		//				this.item.stalkSPRT));
-		this.saveState[0].growOneStep();
+		var l = this.saveState.length;
+		var x = this.pot.position[0] + 2*(~~(Math.random()*9*this.pot.size -(9*this.pot.size)/2));
+		var i;
+		var marker = 0;
+		for(i=0; i<l; ++i) {
+			if(this.saveState[i].position[0] == x) {	// there is already a stalk here
+				this.saveState[i].growOneStep();	// grow it
+				marker = 1;
+				break;
+			}
+		}
+		if(marker == 0) {
+			this.sproutAt([x, this.pot.position[1] + 2*((~~(Math.random()*6))-1)]);
+		}
+		//else {	// grow one stalk picked randomly
+		//	this.saveState[~~(Math.random()*l)].growOneStep();
+		//}
 		++this.step;
 	}
 	
