@@ -34,7 +34,7 @@ var itemButton = new Button([56,0]);
 
 
 // === ITEMS ===
-function Item(position, image) {
+function Item(position, image, sprite, maxsize, onestalk) {
 
 	// --- attributes ---
 	this.position = position;
@@ -44,29 +44,42 @@ function Item(position, image) {
 	this.offset = 16;
 	
 	// - Growth attributes -
-	this.mature = 0;
-	this.maxSize = 10;
-	this.stalkSPRT = new Image();
-	this.stalkSPRT.src = "item1_stalk.png";	// let's assume it's 16*16
+	this.maxSize = maxsize;
+	this.stalkSPRT = sprite;
 	this.steptime = 400;
+	this.oneStalk = onestalk;
 	
 	// --- methods ---
 	this.sow = function() {	// semer
 		// must make a small sprout appear
-		
 	}
 }
 
+// seeds img
 var imgi1 = new Image();
 imgi1.src = "item1.png";
 var imgi2 = new Image();
 imgi2.src = "item2.png";
+// sprites (let's assume it's always 16*16)
+var sprt1 = new Image();
+sprt1.src = "item1_stalk.png";
+var sprt2 = new Image();
+sprt2.src = "item2_stalk.png";
 
-var items = [new Item([70,44],imgi1),new Item([70,92],imgi2),new Item([70,140],imgi1),new Item([70,188],imgi1),
-			new Item([118,44],imgi1),new Item([118,92],imgi1),new Item([118,140],imgi1),new Item([118,188],imgi1),
-			new Item([166,44],imgi1),new Item([166,92],imgi1),new Item([166,140],imgi1),new Item([166,188],imgi1),
-			new Item([214,44],imgi1),new Item([214,92],imgi1),new Item([214,140],imgi1),new Item([214,188],imgi1),
-			new Item([262,44],imgi1),new Item([262,92],imgi1),new Item([262,140],imgi1),new Item([262,188],imgi1)]
+// items
+var item1 = new Item([70,44],imgi1,sprt1,10, 0);
+var item2 = new Item([70,92],imgi2,sprt2, 4, 1);
+
+var items = [item1,item2,
+			new Item([70,140],imgi1,sprt1),new Item([70,188],imgi1,sprt1),
+			new Item([118,44],imgi1,sprt1),new Item([118,92],imgi1,sprt1),
+			new Item([118,140],imgi1,sprt1),new Item([118,188],imgi1,sprt1),
+			new Item([166,44],imgi1,sprt1),new Item([166,92],imgi1,sprt1),
+			new Item([166,140],imgi1,sprt1),new Item([166,188],imgi1,sprt1),
+			new Item([214,44],imgi1,sprt1),new Item([214,92],imgi1,sprt1),
+			new Item([214,140],imgi1,sprt1),new Item([214,188],imgi1,sprt1),
+			new Item([262,44],imgi1,sprt1),new Item([262,92],imgi1,sprt1),
+			new Item([262,140],imgi1,sprt1),new Item([262,188],imgi1,sprt1)]
 			
 var curItemId = 100;	// 100 = no item selected
 // ==========
@@ -151,22 +164,24 @@ function Crop(pot, item) {
 	
 	this.growOneStep = function() {	// grow the plant by one step
 		var l = this.saveState.length;
-		var x = this.pot.position[0] + 2*(~~(Math.random()*9*this.pot.size -(9*this.pot.size)/2));
-		var i;
-		var marker = 0;
-		for(i=0; i<l; ++i) {
-			if(this.saveState[i].position[0] == x) {	// there is already a stalk here
-				this.saveState[i].growOneStep();	// grow it
-				marker = 1;
-				break;
+		if(this.item.oneStalk == 0) {
+			var x = this.pot.position[0] + 2*(~~(Math.random()*9*this.pot.size -(9*this.pot.size)/2));
+			var i;
+			var marker = 0;
+			for(i=0; i<l; ++i) {
+				if(this.saveState[i].position[0] == x) {	// there is already a stalk here
+					this.saveState[i].growOneStep();	// grow it
+					marker = 1;
+					break;
+				}
+			}
+			if(marker == 0) {
+				this.sproutAt([x, this.pot.position[1] + 2*((~~(Math.random()*6))-1)]);
 			}
 		}
-		if(marker == 0) {
-			this.sproutAt([x, this.pot.position[1] + 2*((~~(Math.random()*6))-1)]);
+		else if(this.item.oneStalk == 1) {
+			this.saveState[0].growOneStep();
 		}
-		//else {	// grow one stalk picked randomly
-		//	this.saveState[~~(Math.random()*l)].growOneStep();
-		//}
 		++this.step;
 	}
 	
