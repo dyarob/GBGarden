@@ -116,7 +116,7 @@ function Crop(pot, item) {
 	// --- Attributes ---
 	this.pot = pot;	// pot of the plant (for position and pot size)
 	this.item = item;	// from what seed is it (contain the growth algorithm and sprites etc)
-	this.saveState = [];	// - State save = array list of plant segments with positions and sprites
+	this.saveState = [];	// State save = array list of plant segments with positions and sprites
 	
 	// - Growth attributes -
 	this.timer = 0;
@@ -125,7 +125,7 @@ function Crop(pot, item) {
 	
 	// --- Methods ---
 	this.sprout = function() {	// must make a small sprout appear
-		this.saveState.push(new Stalk(this.pot.position, item.stalkSPRT));
+		this.saveState.push(new Stalk(this.pot.position, this.item.stalkSPRT));
 	}
 	
 	this.grow = function() {	// repeat until full growth (maxSize times)
@@ -141,10 +141,12 @@ function Crop(pot, item) {
 	}
 	
 	this.growOneStep = function() {	// grow the plant by one step
-		var l = this.saveState.length;
-		this.saveState.push(new Stalk(
-						[this.saveState[l-1].position[0] + 2*((~~(Math.random()*3))-1), this.saveState[l-1].position[1]-16],
-						this.item.stalkSPRT));
+		//var l = this.saveState.length;
+		//this.saveState.push(new Stalk(
+		//				[this.saveState[l-1].position[0] + 2*((~~(Math.random()*3))-1), 
+		//				this.saveState[l-1].position[1]-16],
+		//				this.item.stalkSPRT));
+		this.saveState[0].growOneStep();
 		++this.step;
 	}
 	
@@ -158,16 +160,32 @@ function Crop(pot, item) {
 
 // --- Stalk ---
 function Stalk(position, img) {	// to add later: sprite id for plants with more than just one sprite
-	this.position = position;
+
+	// --- Attributes ---
+	this.position = [position[0]-4, position[1]];
 	this.img = img;
+	this.saveState = [this.position];	// State save = array list of posiions of plant segments
+	this.step = 0;	// may be used to monitor max size of stalks
+	
+	// --- Methods ---
+	this.growOneStep = function() {	// grow the plant by one step
+		var l = this.saveState.length;
+		this.saveState.push(
+					[this.saveState[l-1][0] + 2*((~~(Math.random()*3))-1), 
+					 this.saveState[l-1][1] -16 ]);
+		++this.step;
+	}
 	
 	this.draw = function() {
-		try {
-			ctx.drawImage(this.img, 
+		var i;
+		for(i=0; i<this.saveState.length; ++i) {
+			try {
+				ctx.drawImage(this.img, 
 						0, 0, 16, 16,
-						this.position[0]-8, this.position[1]-8, 
+						this.saveState[i][0], this.saveState[i][1], 
 						16, 16);
-		} catch (e) {}
+			} catch (e) {}
+		}
 	}
 }
 
@@ -331,8 +349,7 @@ window.addEventListener('keydown', function(event) {
 	case 96: // numpad 0
 		if(cursor.context == itemsMenuCTX) { // in the item panel
 			// calculation of the desired id based on the position of the cursor
-			curItemId = cursor.context.pMax[0] * cursor.context.pId[1]
-						 + cursor.context.pId[0];
+			curItemId = cursor.context.pMax[0] * cursor.context.pId[1] + cursor.context.pId[0];
 			cursor.context = gardenCTX;
 			cursor.context.pId = [0,1];
 		}
@@ -357,8 +374,7 @@ window.addEventListener('keydown', function(event) {
 	case 188: // ,
 		if(cursor.context == itemsMenuCTX) { // in the item panel
 			// calculation of the desired id based on the position of the cursor
-			curItemId = cursor.context.pMax[0] * cursor.context.pId[1]
-						 + cursor.context.pId[0];
+			curItemId = cursor.context.pMax[0] * cursor.context.pId[1] + cursor.context.pId[0];
 			cursor.context = gardenCTX;
 			cursor.context.pId = [0,1];
 		}
@@ -449,8 +465,8 @@ var GameLoop = function(){
 
 	// scenery
 	drawBG();
-	drawPOTS();
 	drawPLANTS();
+	drawPOTS();
 	
 	// overlay
 	if(cursor.context == itemsMenuCTX) {
