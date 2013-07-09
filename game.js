@@ -34,12 +34,11 @@ var itemButton = new Button([56,0]);
 
 
 // === ITEMS ===
-function Item(position) {
+function Item(position, image) {
 
 	// --- attributes ---
 	this.position = position;
-	this.img = new Image();
-	this.img.src = "item1.png";
+	this.img = image;
 	this.width = 32; //width of the single frame
 	this.height = 32; //height of the single frame
 	this.offset = 16;
@@ -58,13 +57,16 @@ function Item(position) {
 	}
 }
 
-//var item1 = new Item([70,44]);
+var imgi1 = new Image();
+imgi1.src = "item1.png";
+var imgi2 = new Image();
+imgi2.src = "item2.png";
 
-var items = [new Item([70,44]),new Item([70,92]),new Item([70,140]),new Item([70,188]),
-			new Item([118,44]),new Item([118,92]),new Item([118,140]),new Item([118,188]),
-			new Item([166,44]),new Item([166,92]),new Item([166,140]),new Item([166,188]),
-			new Item([214,44]),new Item([214,92]),new Item([214,140]),new Item([214,188]),
-			new Item([262,44]),new Item([262,92]),new Item([262,140]),new Item([262,188])]
+var items = [new Item([70,44],imgi1),new Item([70,92],imgi2),new Item([70,140],imgi1),new Item([70,188],imgi1),
+			new Item([118,44],imgi1),new Item([118,92],imgi1),new Item([118,140],imgi1),new Item([118,188],imgi1),
+			new Item([166,44],imgi1),new Item([166,92],imgi1),new Item([166,140],imgi1),new Item([166,188],imgi1),
+			new Item([214,44],imgi1),new Item([214,92],imgi1),new Item([214,140],imgi1),new Item([214,188],imgi1),
+			new Item([262,44],imgi1),new Item([262,92],imgi1),new Item([262,140],imgi1),new Item([262,188],imgi1)]
 			
 var curItemId = 100;	// 100 = no item selected
 // ==========
@@ -116,7 +118,7 @@ function Crop(pot, item) {
 	// --- Attributes ---
 	this.pot = pot;	// pot of the plant (for position and pot size)
 	this.item = item;	// from what seed is it (contain the growth algorithm and sprites etc)
-	this.saveState = [];	// State save = array list of plant segments with positions and sprites
+	this.saveState = [];	// State save = array list of stalks
 	
 	// - Growth attributes -
 	this.timer = 0;
