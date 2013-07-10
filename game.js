@@ -34,11 +34,12 @@ var itemButton = new Button([56,0]);
 
 
 // === ITEMS ===
-function Item(position, image, sprite, maxsize, dt, onestalk) {
+function Item(position, image, imagesign, sprite, maxsize, dt, onestalk) {
 
 	// --- attributes ---
 	this.position = position;
 	this.img = image;
+	this.sign = imagesign;
 	this.width = 32; //width of the single frame
 	this.height = 32; //height of the single frame
 	this.offset = 16;
@@ -60,6 +61,11 @@ var imgi1 = new Image();
 imgi1.src = "item1.png";
 var imgi2 = new Image();
 imgi2.src = "item2.png";
+// signs
+var sign1 = new Image();
+sign1.src = "item1_sign.png";
+var sign2 = new Image();
+sign2.src = "item2_sign.png";
 // sprites (let's assume it's always 16*16)
 var sprt1 = new Image();
 sprt1.src = "item1_stalk.png";
@@ -67,8 +73,8 @@ var sprt2 = new Image();
 sprt2.src = "item2_stalk.png";
 
 // items
-var item1 = new Item([70,44],imgi1,sprt1,8, 500, 0);
-var item2 = new Item([70,92],imgi2,sprt2, 5, 5000, 1);
+var item1 = new Item([70,44],imgi1,sign1,sprt1, 6, 500, 0);
+var item2 = new Item([70,92],imgi2,sign2,sprt2, 4, 5000, 1);
 
 var items = [item1,item2,
 			new Item([70,140],imgi1,sprt1),new Item([70,188],imgi1,sprt1),
@@ -108,7 +114,7 @@ function Pot(position, size) {
 	this.drawSign = function() {
 		if(this.crop != 100) {
 			try {
-				ctx.drawImage(items[this.crop].img, 
+				ctx.drawImage(items[this.crop].sign, 
 							0, 0, items[this.crop].width, items[this.crop].height,
 							this.signPosition[0], this.signPosition[1] + items[this.crop].offset, 
 							items[this.crop].width, items[this.crop].height);
