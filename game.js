@@ -73,7 +73,7 @@ var sprt2 = new Image();
 sprt2.src = "item2_stalk.png";
 
 // items
-var item1 = new Item([70,44],imgi1,sign1,sprt1, 6, 500, 0);
+var item1 = new Item([70,44],imgi1,sign1,sprt1, 5, 500, 0);
 var item2 = new Item([70,92],imgi2,sign2,sprt2, 4, 5000, 1);
 
 var items = [item1,item2,
@@ -470,22 +470,37 @@ window.addEventListener('keydown', function(event) {
 
 
 // === drawing ===
+var BGimg = new Image();
+BGimg.src = "BG.png";
 var drawBG = function(){
-	var BGimg = new Image();
-	BGimg.src = "BGimg.png";
 	try {
 		ctx.drawImage(BGimg, 0, 0, 320, 288, 0, 0, 320, 288);
 	} catch (e) {}
 }
+
+var MENUimg = new Image();
+MENUimg.src = "MENUimg.png";
 var drawMENU = function(){
-	var MENUimg = new Image();
-	MENUimg.src = "MENUimg.png";
 	try {
 		ctx.drawImage(MENUimg, 0, 0, 320, 288, 0, 0, 320, 288);
 	} catch (e) {}
 }
+
+var BUTTONSimg = new Image();
+BUTTONSimg.src = "BUTTONS.png";
+var drawBUTTONS = function(){
+	try {
+		ctx.drawImage(BUTTONSimg, 0, 0, 320, 288, 0, 0, 320, 288);
+	} catch (e) {}
+}
+
+var POTSimg = new Image();
+POTSimg.src = "pots.png";
 var drawPOTS = function(){
 	var i;
+	try {
+		ctx.drawImage(POTSimg, 0, 0, 320, 288, 0, 0, 320, 288);
+	} catch (e) {}
 	for(i=0; i<pots.length; ++i) {
 		pots[i].drawSign();
 	}
@@ -512,6 +527,7 @@ var GameLoop = function(){
 	drawBG();
 	drawPLANTS();
 	drawPOTS();
+	drawBUTTONS();
 	
 	// overlay
 	if(cursor.context == itemsMenuCTX) {
