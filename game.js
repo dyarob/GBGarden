@@ -34,7 +34,7 @@ var itemButton = new Button([56,0]);
 
 
 // === ITEMS ===
-function Item(position, image, sprite, maxsize, onestalk) {
+function Item(position, image, sprite, maxsize, dt, onestalk) {
 
 	// --- attributes ---
 	this.position = position;
@@ -46,7 +46,7 @@ function Item(position, image, sprite, maxsize, onestalk) {
 	// - Growth attributes -
 	this.maxSize = maxsize;
 	this.stalkSPRT = sprite;
-	this.steptime = 400;
+	this.steptime = dt;
 	this.oneStalk = onestalk;
 	
 	// --- methods ---
@@ -67,8 +67,8 @@ var sprt2 = new Image();
 sprt2.src = "item2_stalk.png";
 
 // items
-var item1 = new Item([70,44],imgi1,sprt1,10, 0);
-var item2 = new Item([70,92],imgi2,sprt2, 4, 1);
+var item1 = new Item([70,44],imgi1,sprt1,8, 500, 0);
+var item2 = new Item([70,92],imgi2,sprt2, 5, 5000, 1);
 
 var items = [item1,item2,
 			new Item([70,140],imgi1,sprt1),new Item([70,188],imgi1,sprt1),
@@ -108,10 +108,10 @@ function Pot(position, size) {
 	this.drawSign = function() {
 		if(this.crop != 100) {
 			try {
-				ctx.drawImage(items[0].img, 
-							0, 0, items[0].width, items[0].height,
-							this.signPosition[0], this.signPosition[1] + items[0].offset, 
-							items[0].width, items[0].height);
+				ctx.drawImage(items[this.crop].img, 
+							0, 0, items[this.crop].width, items[this.crop].height,
+							this.signPosition[0], this.signPosition[1] + items[this.crop].offset, 
+							items[this.crop].width, items[this.crop].height);
 			} catch (e) {}
 		}
 	}
@@ -164,14 +164,16 @@ function Crop(pot, item) {
 	
 	this.growOneStep = function() {	// grow the plant by one step
 		var l = this.saveState.length;
-		if(this.item.oneStalk == 0) {
+		if(this.item.oneStalk == 0) {	// plant with multiple stalks
 			var x = this.pot.position[0] + 2*(~~(Math.random()*9*this.pot.size -(9*this.pot.size)/2));
 			var i;
 			var marker = 0;
 			for(i=0; i<l; ++i) {
 				if(this.saveState[i].position[0] == x) {	// there is already a stalk here
-					this.saveState[i].growOneStep();	// grow it
-					marker = 1;
+					if(this.saveState[i].size < this.item.maxSize) {
+						this.saveState[i].growOneStep();	// grow it
+						marker = 1;
+					}
 					break;
 				}
 			}
@@ -179,8 +181,10 @@ function Crop(pot, item) {
 				this.sproutAt([x, this.pot.position[1] + 2*((~~(Math.random()*6))-1)]);
 			}
 		}
-		else if(this.item.oneStalk == 1) {
-			this.saveState[0].growOneStep();
+		else if(this.item.oneStalk == 1) {	// only one stalk (type cactus)
+			if(this.saveState[0].size < this.item.maxSize) {
+				this.saveState[0].growOneStep();
+			}
 		}
 		++this.step;
 	}
@@ -200,7 +204,7 @@ function Stalk(position, img) {	// to add later: sprite id for plants with more 
 	this.position = [position[0]-4, position[1]];
 	this.img = img;
 	this.saveState = [this.position];	// State save = array list of posiions of plant segments
-	this.step = 0;	// may be used to monitor max size of stalks
+	this.size = 0;	// may be used to monitor max size of stalks
 	
 	// --- Methods ---
 	this.growOneStep = function() {	// grow the plant by one step
@@ -208,7 +212,7 @@ function Stalk(position, img) {	// to add later: sprite id for plants with more 
 		this.saveState.push(
 					[this.saveState[l-1][0] + 2*((~~(Math.random()*3))-1), 
 					 this.saveState[l-1][1] -16 ]);
-		++this.step;
+		++this.size;
 	}
 	
 	this.draw = function() {
