@@ -94,11 +94,12 @@ var curItemId = 100;	// 100 = no item selected
 
 // === POTS ===
 // --- Constructor ---
-function Pot(position, size) {
+function Pot(position, size, image) {
 
 	// --- attributes ---
 	this.position = position;
 	this.size = size; // 1 = small (1 tile wide); 2 = medium (2t); 3 = big (3t)
+	this.img = image;
 	this.crop = 100;	// 100 = nothing
 	this.crop2;	
 	this.signPosition = [this.position[0] - 16, this.position[1] - 10];
@@ -111,21 +112,48 @@ function Pot(position, size) {
 		this.crop2 = crop;
 	}
 	
-	this.drawSign = function() {
+	this.draw = function() {
 		if(this.crop != 100) {
-			try {
-				ctx.drawImage(items[this.crop].sign, 
-							0, 0, items[this.crop].width, items[this.crop].height,
-							this.signPosition[0], this.signPosition[1] + items[this.crop].offset, 
-							items[this.crop].width, items[this.crop].height);
-			} catch (e) {}
+			this.crop2.draw();
+		}
+		try {
+			ctx.drawImage(this.img, 0, 0, 320, 288, 0, 0, 320, 288);
+		} catch (e) {}
+		if(this.crop != 100) {
+			this.drawSign();
 		}
 	}
+	
+	this.drawSign = function() {
+		try {
+			ctx.drawImage(items[this.crop].sign, 
+						0, 0, items[this.crop].width, items[this.crop].height,
+						this.signPosition[0], this.signPosition[1] + items[this.crop].offset, 
+						items[this.crop].width, items[this.crop].height);
+		} catch (e) {}
+	}
 }
-var pots = [new Pot([25,190], 3),new Pot([80,222], 1),
-			new Pot([130,212], 2),new Pot([160, 242], 1),
-			new Pot([198, 242], 1),new Pot([244, 224], 2),
-			new Pot([292, 210], 2)]
+
+// img pots
+var POT0img = new Image();
+POT0img.src = "pot1.png";
+var POT1img = new Image();
+POT1img.src = "pot2.png";
+var POT2img = new Image();
+POT2img.src = "pot3.png";
+var POT3img = new Image();
+POT3img.src = "pot4.png";
+var POT4img = new Image();
+POT4img.src = "pot5.png";
+var POT5img = new Image();
+POT5img.src = "pot6.png";
+var POT6img = new Image();
+POT6img.src = "pot7.png";
+
+var pots = [new Pot([25,190], 3, POT6img), new Pot([80,222], 1, POT2img),
+			new Pot([130,212], 2, POT4img),new Pot([160, 242], 1, POT0img),
+			new Pot([198, 242], 1, POT1img),new Pot([244, 224], 2, POT5img),
+			new Pot([292, 210], 2, POT3img)]
 // ==========
 
 
@@ -494,16 +522,18 @@ var drawBUTTONS = function(){
 	} catch (e) {}
 }
 
-var POTSimg = new Image();
-POTSimg.src = "pots.png";
+//var POTSimg = new Image();
+//POTSimg.src = "pots.png";
+
 var drawPOTS = function(){
-	var i;
-	try {
-		ctx.drawImage(POTSimg, 0, 0, 320, 288, 0, 0, 320, 288);
-	} catch (e) {}
-	for(i=0; i<pots.length; ++i) {
-		pots[i].drawSign();
-	}
+	// in the right order: background -> foreground
+	pots[0].draw();
+	pots[5].draw();
+	pots[2].draw();
+	pots[6].draw();
+	pots[1].draw();
+	pots[4].draw();
+	pots[3].draw();
 }
 var drawPLANTS = function(){
 	var i;
