@@ -75,7 +75,7 @@ function Item(position, image, imagesign, sprite, maxsize, dt, onestalk) {
 		
 		if(q == 0) {
 			try {
-				ctx.drawImage(tinyfont, 0, 0, 8, 8, this.position[1] +32, this.position[0] +12, 8, 8);
+				ctx.drawImage(tinyfont, 0, 0, 8, 8, this.position[0] +6, this.position[1] +38, 8, 8);
 			} catch (e) {}
 		}
 		else {
@@ -87,7 +87,7 @@ function Item(position, image, imagesign, sprite, maxsize, dt, onestalk) {
 				
 				// draw
 				try {
-					ctx.drawImage(tinyfont, d*8, 0, 8, 8, this.position[1] +32, this.position[0] -i*8 +12, 8, 8);
+					ctx.drawImage(tinyfont, d*8, 0, 8, 8, this.position[0]-i*8 +6, this.position[1] +38, 8, 8);
 				} catch (e) {}
 				
 				// iterate
@@ -116,16 +116,20 @@ sprt2.src = "item2_stalk.png";
 
 // items
 var item1 = new Item([70,44],imgi1,sign1,sprt1, 5, 500, 0);
-var item2 = new Item([70,92],imgi2,sign2,sprt2, 4, 5000, 1);
+var item2 = new Item([118,44],imgi2,sign2,sprt2, 4, 5000, 1);
 
-var items = [item1,item2,
+var items = [item1, new Item([70,92],imgi1,sprt1),
 			new Item([70,140],imgi1,sprt1),new Item([70,188],imgi1,sprt1),
-			new Item([118,44],imgi1,sprt1),new Item([118,92],imgi1,sprt1),
+			
+			item2,new Item([118,92],imgi1,sprt1),
 			new Item([118,140],imgi1,sprt1),new Item([118,188],imgi1,sprt1),
+			
 			new Item([166,44],imgi1,sprt1),new Item([166,92],imgi1,sprt1),
 			new Item([166,140],imgi1,sprt1),new Item([166,188],imgi1,sprt1),
+			
 			new Item([214,44],imgi1,sprt1),new Item([214,92],imgi1,sprt1),
 			new Item([214,140],imgi1,sprt1),new Item([214,188],imgi1,sprt1),
+			
 			new Item([262,44],imgi1,sprt1),new Item([262,92],imgi1,sprt1),
 			new Item([262,140],imgi1,sprt1),new Item([262,188],imgi1,sprt1)];
 			
@@ -470,10 +474,14 @@ window.addEventListener('keydown', function(event) {
 	// --- A ---
 	case 96: // numpad 0
 		if(cursor.context == itemsMenuCTX) { // in the item panel
-			// calculation of the desired id based on the position of the cursor
-			curItemId = cursor.context.pMax[0] * cursor.context.pId[1] + cursor.context.pId[0];
-			cursor.context = gardenCTX;
-			cursor.context.pId = [0,1];
+			var id = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
+			if(items[id].quantity > 0) {
+				// calculation of the desired id based on the position of the cursor
+				curItemId = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
+				cursor.context = gardenCTX;
+				cursor.context.pId = [0,1];
+				--items[id].quantity;
+			}
 		}
 		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
 			cursor.context = itemsMenuCTX;
@@ -499,10 +507,14 @@ window.addEventListener('keydown', function(event) {
 	break;
 	case 188: // ,
 		if(cursor.context == itemsMenuCTX) { // in the item panel
-			// calculation of the desired id based on the position of the cursor
-			curItemId = cursor.context.pMax[0] * cursor.context.pId[1] + cursor.context.pId[0];
-			cursor.context = gardenCTX;
-			cursor.context.pId = [0,1];
+			var id = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
+			if(items[id].quantity > 0) {
+				// calculation of the desired id based on the position of the cursor
+				curItemId = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
+				cursor.context = gardenCTX;
+				cursor.context.pId = [0,1];
+				--items[id].quantity;
+			}
 		}
 		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
 			cursor.context = itemsMenuCTX;
