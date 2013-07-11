@@ -21,6 +21,13 @@ c.height = height;
 
 
 
+// === Images ===
+var tinyfont = new Image();
+tinyfont.src = "tinyfont_big.png";
+// ==========
+
+
+
 // ===== OBJECTS =====
 
 // === Buttons ===
@@ -50,9 +57,44 @@ function Item(position, image, imagesign, sprite, maxsize, dt, onestalk) {
 	this.steptime = dt;
 	this.oneStalk = onestalk;
 	
+	// - inventory -
+	this.quantity = 0;
+	
 	// --- methods ---
 	this.sow = function() {	// semer
 		// must make a small sprout appear
+	}
+	this.setQuantity = function(q) {
+		this.quantity = q;
+	}
+	this.drawQuantity = function() {
+	
+		var i = 0;
+		var q = this.quantity;
+		var d;
+		
+		if(q == 0) {
+			try {
+				ctx.drawImage(tinyfont, 0, 0, 8, 8, this.position[1] +32, this.position[0] +12, 8, 8);
+			} catch (e) {}
+		}
+		else {
+			// get number of digits
+			while(q != 0) {
+				
+				// get digit
+				d = q % 10;
+				
+				// draw
+				try {
+					ctx.drawImage(tinyfont, d*8, 0, 8, 8, this.position[1] +32, this.position[0] -i*8 +12, 8, 8);
+				} catch (e) {}
+				
+				// iterate
+				q = ~~(q/10);
+				++i;
+			}
+		}
 	}
 }
 
@@ -85,9 +127,11 @@ var items = [item1,item2,
 			new Item([214,44],imgi1,sprt1),new Item([214,92],imgi1,sprt1),
 			new Item([214,140],imgi1,sprt1),new Item([214,188],imgi1,sprt1),
 			new Item([262,44],imgi1,sprt1),new Item([262,92],imgi1,sprt1),
-			new Item([262,140],imgi1,sprt1),new Item([262,188],imgi1,sprt1)]
+			new Item([262,140],imgi1,sprt1),new Item([262,188],imgi1,sprt1)];
 			
 var curItemId = 100;	// 100 = no item selected
+item1.setQuantity(3);
+item2.setQuantity(1);
 // ==========
 
 
@@ -593,6 +637,13 @@ var drawPLANTS = function(){
 		}
 	}
 }
+
+var drawQuantities = function(){
+	var i;
+	for(i=0; i<items.length; ++i) {
+			items[i].drawQuantity();
+	}
+}
 // ==========
 
 
@@ -613,6 +664,7 @@ var GameLoop = function(){
 	// overlay
 	if(cursor.context == itemsMenuCTX) {
 		drawMENU();
+		drawQuantities();
 	}
 	cursor.context.setPosition();
     cursor.draw();
