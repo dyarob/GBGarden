@@ -330,15 +330,20 @@ var itemsMenuCTX = new (function(){
 
 
 // === Cursor object ===
+cursorimg = new Image();
+cursorimg.src = "cursor.png";
+scytheimg = new Image();
+scytheimg.src = "scythe.png";
+	
 var cursor = new (function(){
-	this.img = new Image();
-	this.img.src = "cursor.png";
+	this.img = cursorimg;
 
 	this.width = 16; //width of the single frame
 	this.height = 16; //height of the single frame
 	this.offset = 0;
 
 	this.context = gardenCTX;
+	this.scythemode = 0;
 
 	this.draw = function(){
 		try {
@@ -443,6 +448,10 @@ window.addEventListener('keydown', function(event) {
 																			// Plant!
 			curItemId = 100;	// deselect current item
 		}
+		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && cursor.scythemode == 1) { 
+																			// on a pot in scythe mode
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(100);	
+		}
 	break;
 	case 188: // ,
 		if(cursor.context == itemsMenuCTX) { // in the item panel
@@ -468,6 +477,10 @@ window.addEventListener('keydown', function(event) {
 																			// Plant!
 			curItemId = 100;	// deselect current item
 		}
+		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && cursor.scythemode == 1) { 
+																			// on a pot in scythe mode
+			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(100);	
+		}
 	break;
 
 	// --- B ---
@@ -478,6 +491,16 @@ window.addEventListener('keydown', function(event) {
 		else if(cursor.context == itemsMenuCTX) {
 			cursor.context = gardenCTX;	// exit item menu
 		}
+		else if(cursor.context == gardenCTX) {
+			if(cursor.scythemode == 0) {	// go to scythe mode
+				cursor.img = scytheimg;
+				cursor.scythemode = 1;
+			}
+			else if(cursor.scythemode == 1) {
+				cursor.img = cursorimg;
+				cursor.scythemode = 0;
+			}
+		}
 	break;
 	case 190: // period .
 		if(curItemId != 100) {
@@ -485,6 +508,16 @@ window.addEventListener('keydown', function(event) {
 		}
 		else if(cursor.context == itemsMenuCTX) {
 			cursor.context = gardenCTX;	// exit item menu
+		}
+		else if(cursor.context == gardenCTX) {
+			if(cursor.scythemode == 0) {	// go to scythe mode
+				cursor.img = scytheimg;
+				cursor.scythemode = 1;
+			}
+			else if(cursor.scythemode == 1) {
+				cursor.img = cursorimg;
+				cursor.scythemode = 0;
+			}
 		}
 	break;
   }
@@ -522,6 +555,23 @@ var drawBUTTONS = function(){
 	} catch (e) {}
 }
 
+var SCYTHEONimg = new Image();
+SCYTHEONimg.src = "scytheon.png";
+var SCYTHEOFFimg = new Image();
+SCYTHEOFFimg.src = "scytheoff.png";
+var drawSCYTHE = function(){
+	if(cursor.scythemode == 0) {
+		try {
+			ctx.drawImage(SCYTHEONimg, 0, 0, 320, 288, 0, 0, 320, 288);
+		} catch (e) {}
+	}
+	else if(cursor.scythemode == 1) {
+		try {
+			ctx.drawImage(SCYTHEOFFimg, 0, 0, 320, 288, 0, 0, 320, 288);
+		} catch (e) {}
+	}
+}
+
 //var POTSimg = new Image();
 //POTSimg.src = "pots.png";
 
@@ -557,6 +607,7 @@ var GameLoop = function(){
 	drawBG();
 	drawPLANTS();
 	drawPOTS();
+	drawSCYTHE();
 	drawBUTTONS();
 	
 	// overlay
