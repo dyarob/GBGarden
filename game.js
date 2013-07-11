@@ -424,163 +424,130 @@ window.addEventListener('keydown', function(event) {
 
 	// --- LEFT ---
     case 37: // Left
-		if(cursor.context.pId[0] > 0)
-			--cursor.context.pId[0];
-		else cursor.context.pId[0] = cursor.context.pMax[0];
+		Left();
     break;
     case 65: // a
-		if(cursor.context.pId[0] > 0)
-			--cursor.context.pId[0];
-		else cursor.context.pId[0] = cursor.context.pMax[0];
+		Left();
     break;
 
 	// --- RIGHT ---
     case 39: // Right
-		if(cursor.context.pId[0] < cursor.context.pMax[0])
-			++cursor.context.pId[0];
-		else cursor.context.pId[0] = 0;
+		Right();
     break;
     case 68: // d
-		if(cursor.context.pId[0] < cursor.context.pMax[0])
-			++cursor.context.pId[0];
-		else cursor.context.pId[0] = 0;
-    break;
-
-	// --- DOWN ---
-    case 40: // Down
-		if(cursor.context.pId[1] < cursor.context.pMax[1])
-			++cursor.context.pId[1];
-		else cursor.context.pId[1] = 0;
-    break;
-    case 83: // s
-		if(cursor.context.pId[1] < cursor.context.pMax[1])
-			++cursor.context.pId[1];
-		else cursor.context.pId[1] = 0;
+		Right();
     break;
 
 	// --- UP ---
     case 38: // Up
-		if(cursor.context.pId[1] > 0)
-			--cursor.context.pId[1];
-		else cursor.context.pId[1] = cursor.context.pMax[1];
+		Up();
     break;
     case 87: // w
-		if(cursor.context.pId[1] > 0)
-			--cursor.context.pId[1];
-		else cursor.context.pId[1] = cursor.context.pMax[1];
+		Up();
+    break;
+
+	// --- DOWN ---
+    case 40: // Down
+		Down();
+    break;
+    case 83: // s
+		Down();
     break;
 
 	
 	// --- A ---
 	case 96: // numpad 0
-		if(cursor.context == itemsMenuCTX) { // in the item panel
-			var id = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
-			if(items[id].quantity > 0) {
-				// calculation of the desired id based on the position of the cursor
-				curItemId = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
-				cursor.context = gardenCTX;
-				cursor.context.pId = [0,1];
-				--items[id].quantity;
-			}
-		}
-		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
-			cursor.context = itemsMenuCTX;
-		}
-		//else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId == 100) { 
-		//																	// on a pot without an item
-		//	cursor.context = itemsMenuCTX;
-		//}
-		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId != 100) { 
-																			// on a pot with an item
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(curItemId);	
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop2(
-						new Crop(cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]], 
-						items[curItemId]));	
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.sprout();
-																			// Plant!
-			curItemId = 100;	// deselect current item
-		}
-		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && cursor.scythemode == 1) { 
-																			// on a pot in scythe mode
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(100);	
-		}
+		A();
 	break;
 	case 188: // ,
-		if(cursor.context == itemsMenuCTX) { // in the item panel
-			var id = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
-			if(items[id].quantity > 0) {
-				// calculation of the desired id based on the position of the cursor
-				curItemId = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
-				cursor.context = gardenCTX;
-				cursor.context.pId = [0,1];
-				--items[id].quantity;
-			}
-		}
-		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
-			cursor.context = itemsMenuCTX;
-		}
-		//else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId == 100) { 
-		//																	// on a pot without an item
-		//	cursor.context = itemsMenuCTX;
-		//}
-		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId != 100) { 
-																			// on a pot with an item
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(curItemId);	
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop2(
-						new Crop(cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]], 
-						items[curItemId]));	
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.sprout();
-																			// Plant!
-			curItemId = 100;	// deselect current item
-		}
-		else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && cursor.scythemode == 1) { 
-																			// on a pot in scythe mode
-			cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(100);	
-		}
+		A();
 	break;
 
 	// --- B ---
 	case 110: // numpad .
-		if(curItemId != 100) {
-			curItemId = 100;	// deselect current item
-		}
-		else if(cursor.context == itemsMenuCTX) {
-			cursor.context = gardenCTX;	// exit item menu
-		}
-		else if(cursor.context == gardenCTX) {
-			if(cursor.scythemode == 0) {	// go to scythe mode
-				cursor.img = scytheimg;
-				cursor.scythemode = 1;
-			}
-			else if(cursor.scythemode == 1) {
-				cursor.img = cursorimg;
-				cursor.scythemode = 0;
-			}
-		}
+		B();
 	break;
 	case 190: // period .
-		if(curItemId != 100) {
-			curItemId = 100;	// deselect current item
-		}
-		else if(cursor.context == itemsMenuCTX) {
-			cursor.context = gardenCTX;	// exit item menu
-		}
-		else if(cursor.context == gardenCTX) {
-			if(cursor.scythemode == 0) {	// go to scythe mode
-				cursor.img = scytheimg;
-				cursor.scythemode = 1;
-			}
-			else if(cursor.scythemode == 1) {
-				cursor.img = cursorimg;
-				cursor.scythemode = 0;
-			}
-		}
+		B();
 	break;
   }
   
 	cursor.context.setPosition();
 	
 }, false);
+
+// --- METHODS ---
+var Left = function() {
+	if(cursor.context.pId[0] > 0)
+		--cursor.context.pId[0];
+	else cursor.context.pId[0] = cursor.context.pMax[0];
+}
+var Right = function() {
+	if(cursor.context.pId[0] < cursor.context.pMax[0])
+		++cursor.context.pId[0];
+	else cursor.context.pId[0] = 0;
+}
+var Up = function() {
+	if(cursor.context.pId[1] > 0)
+		--cursor.context.pId[1];
+	else cursor.context.pId[1] = cursor.context.pMax[1];
+}
+var Down = function() {
+	if(cursor.context.pId[1] < cursor.context.pMax[1])
+		++cursor.context.pId[1];
+	else cursor.context.pId[1] = 0;
+}
+var A = function() {
+	if(cursor.context == itemsMenuCTX) { // in the item panel
+		var id = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
+		if(items[id].quantity > 0) {
+			// calculation of the desired id based on the position of the cursor
+			curItemId = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
+			cursor.context = gardenCTX;
+			cursor.context.pId = [0,1];
+			--items[id].quantity;
+		}
+	}
+	else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
+		cursor.context = itemsMenuCTX;
+	}
+	//else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId == 100) { 
+	//																	// on a pot without an item
+	//	cursor.context = itemsMenuCTX;
+	//}
+	else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId != 100) { 
+																		// on a pot with an item
+		cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(curItemId);	
+		cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop2(
+					new Crop(cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]], 
+					items[curItemId]));	
+		cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.sprout();
+																		// Plant!
+		curItemId = 100;	// deselect current item
+	}
+	else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && cursor.scythemode == 1) { 
+																		// on a pot in scythe mode
+		cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(100);	
+	}
+}
+var B = function() {
+	if(curItemId != 100) {
+		curItemId = 100;	// deselect current item
+	}
+	else if(cursor.context == itemsMenuCTX) {
+		cursor.context = gardenCTX;	// exit item menu
+	}
+	else if(cursor.context == gardenCTX) {
+		if(cursor.scythemode == 0) {	// go to scythe mode
+			cursor.img = scytheimg;
+			cursor.scythemode = 1;
+		}
+		else if(cursor.scythemode == 1) {
+			cursor.img = cursorimg;
+			cursor.scythemode = 0;
+		}
+	}
+}
 // ==========
 
 
