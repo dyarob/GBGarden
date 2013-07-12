@@ -36,6 +36,7 @@ function Button(position) {
 	this.position = position;
 }
 var itemButton = new Button([56,0]);
+var tradeButton = new Button([304,0]);
 // ==========
 
 
@@ -333,9 +334,9 @@ var gardenCTX = new (function(){
 				[itemButton, pots[1]],
 				[itemButton, pots[2]],
 				[itemButton, pots[3]],
-				[itemButton, pots[4]],
-				[itemButton, pots[5]],
-				[itemButton, pots[6]]];
+				[tradeButton, pots[4]],
+				[tradeButton, pots[5]],
+				[tradeButton, pots[6]]];
 	this.pId = [0,1];
 	this.pMax = [6,1];
 
@@ -477,13 +478,25 @@ window.addEventListener('keydown', function(event) {
 
 // --- METHODS ---
 var Left = function() {
-	if(cursor.context.pId[0] > 0)
+	if(cursor.context.pId[1] == 0) { // on the buttons bar
+		if(cursor.context.pId[0] > 3)	// on trade button
+			cursor.context.pId[0] = 0;
+		else if(cursor.context.pId[0] <= 3)	// on trade button
+			cursor.context.pId[0] = 6;
+	}
+	else if(cursor.context.pId[1] == 1 && cursor.context.pId[0] > 0)
 		--cursor.context.pId[0];
 	else cursor.context.pId[0] = cursor.context.pMax[0];
 }
 
 var Right = function() {
-	if(cursor.context.pId[0] < cursor.context.pMax[0])
+	if(cursor.context.pId[1] == 0) { // on the buttons bar
+		if(cursor.context.pId[0] > 3)	// on trade button
+			cursor.context.pId[0] = 0;
+		else if(cursor.context.pId[0] <= 3)	// on trade button
+			cursor.context.pId[0] = 6;
+	}
+	else if(cursor.context.pId[0] < cursor.context.pMax[0])
 		++cursor.context.pId[0];
 	else cursor.context.pId[0] = 0;
 }
@@ -511,7 +524,10 @@ var A = function() {
 			--items[id].quantity;
 		}
 	}
-	else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the button
+	else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0 && cursor.context.pId[0] <= 3) { // item menu button
+		cursor.context = itemsMenuCTX;
+	}
+	else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0 && cursor.context.pId[0] > 3) { // trade menu button
 		cursor.context = itemsMenuCTX;
 	}
 	//else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId == 100) { 
@@ -531,7 +547,8 @@ var A = function() {
 	else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && cursor.scythemode == 1) { 
 																		// on a pot in scythe mode
 		cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.item.quantity += 
-					cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.step;	
+					cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.step +1;
+																		// harvest!
 		cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(100);	
 	}
 }
@@ -550,7 +567,7 @@ var B = function() {
 		}
 		else if(cursor.scythemode == 1) {
 			cursor.img = cursorimg;
-			cursor.scythemode = 0;
+			cursor.scythemode = 0;	// back to normal mode
 		}
 	}
 }
