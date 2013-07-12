@@ -362,9 +362,25 @@ var itemsMenuCTX = new (function(){
 				// colonne 4
 				[items[12],items[13],items[14],items[15]],
 				// colonne 5
-				[items[16],items[17],items[18],items[20]]];
+				[items[16],items[17],items[18],items[19]]];
 	this.pId = [0,0];
 	this.pMax = [4,3];
+
+	this.X = 0; //X&Y position
+	this.Y = 0;
+	
+	// --- methods ---
+	this.setPosition = function(){
+		this.X = this.ptab[this.pId[0]][this.pId[1]].position[0];
+		this.Y = this.ptab[this.pId[0]][this.pId[1]].position[1];
+	}
+})();
+
+
+var tradeMenuCTX = new (function(){
+	this.ptab = [[items[16],items[17],items[18],items[19]]];
+	this.pId = [0,0];
+	this.pMax = [0,3];
 
 	this.X = 0; //X&Y position
 	this.Y = 0;
@@ -478,19 +494,19 @@ window.addEventListener('keydown', function(event) {
 
 // --- METHODS ---
 var Left = function() {
-	if(cursor.context.pId[1] == 0) { // on the buttons bar
+	if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the buttons bar
 		if(cursor.context.pId[0] > 3)	// on trade button
 			cursor.context.pId[0] = 0;
 		else if(cursor.context.pId[0] <= 3)	// on trade button
 			cursor.context.pId[0] = 6;
 	}
-	else if(cursor.context.pId[1] == 1 && cursor.context.pId[0] > 0)
+	else if(cursor.context.pId[0] > 0)
 		--cursor.context.pId[0];
 	else cursor.context.pId[0] = cursor.context.pMax[0];
 }
 
 var Right = function() {
-	if(cursor.context.pId[1] == 0) { // on the buttons bar
+	if(cursor.context == gardenCTX && cursor.context.pId[1] == 0) { // on the buttons bar
 		if(cursor.context.pId[0] > 3)	// on trade button
 			cursor.context.pId[0] = 0;
 		else if(cursor.context.pId[0] <= 3)	// on trade button
@@ -528,7 +544,7 @@ var A = function() {
 		cursor.context = itemsMenuCTX;
 	}
 	else if(cursor.context == gardenCTX && cursor.context.pId[1] == 0 && cursor.context.pId[0] > 3) { // trade menu button
-		cursor.context = itemsMenuCTX;
+		cursor.context = tradeMenuCTX;
 	}
 	//else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && curItemId == 100) { 
 	//																	// on a pot without an item
@@ -557,7 +573,7 @@ var B = function() {
 	if(curItemId != 100) {
 		curItemId = 100;	// deselect current item
 	}
-	else if(cursor.context == itemsMenuCTX) {
+	else if(cursor.context == itemsMenuCTX || cursor.context == tradeMenuCTX) {
 		cursor.context = gardenCTX;	// exit item menu
 	}
 	else if(cursor.context == gardenCTX) {
@@ -590,6 +606,14 @@ MENUimg.src = "MENUimg.png";
 var drawMENU = function(){
 	try {
 		ctx.drawImage(MENUimg, 0, 0, 320, 288, 0, 0, 320, 288);
+	} catch (e) {}
+}
+
+var tradeMENUimg = new Image();
+tradeMENUimg.src = "tradeMENU.png";
+var drawtradeMENU = function(){
+	try {
+		ctx.drawImage(tradeMENUimg, 0, 0, 320, 288, 0, 0, 320, 288);
 	} catch (e) {}
 }
 
@@ -667,6 +691,9 @@ var GameLoop = function(){
 	if(cursor.context == itemsMenuCTX) {
 		drawMENU();
 		drawQuantities();
+	}
+	if(cursor.context == tradeMenuCTX) {
+		drawtradeMENU();
 	}
 	cursor.context.setPosition();
     cursor.draw();
