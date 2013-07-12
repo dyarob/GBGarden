@@ -454,7 +454,6 @@ window.addEventListener('keydown', function(event) {
 		Down();
     break;
 
-	
 	// --- A ---
 	case 96: // numpad 0
 		A();
@@ -482,21 +481,25 @@ var Left = function() {
 		--cursor.context.pId[0];
 	else cursor.context.pId[0] = cursor.context.pMax[0];
 }
+
 var Right = function() {
 	if(cursor.context.pId[0] < cursor.context.pMax[0])
 		++cursor.context.pId[0];
 	else cursor.context.pId[0] = 0;
 }
+
 var Up = function() {
 	if(cursor.context.pId[1] > 0)
 		--cursor.context.pId[1];
 	else cursor.context.pId[1] = cursor.context.pMax[1];
 }
+
 var Down = function() {
 	if(cursor.context.pId[1] < cursor.context.pMax[1])
 		++cursor.context.pId[1];
 	else cursor.context.pId[1] = 0;
 }
+
 var A = function() {
 	if(cursor.context == itemsMenuCTX) { // in the item panel
 		var id = cursor.context.pMax[0] * cursor.context.pId[0] + cursor.context.pId[1];
@@ -527,9 +530,12 @@ var A = function() {
 	}
 	else if(cursor.context == gardenCTX && cursor.context.pId[1] == 1 && cursor.scythemode == 1) { 
 																		// on a pot in scythe mode
+		cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.item.quantity += 
+					cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].crop2.step;	
 		cursor.context.ptab[cursor.context.pId[0]][cursor.context.pId[1]].setCrop(100);	
 	}
 }
+
 var B = function() {
 	if(curItemId != 100) {
 		curItemId = 100;	// deselect current item
