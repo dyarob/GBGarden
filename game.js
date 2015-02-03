@@ -441,55 +441,47 @@ window.addEventListener('keydown', function(event) {
 
 	// --- LEFT ---
     case 37: // Left
-		Left();
-    break;
     case 65: // a
+	case 72: // h
 		Left();
     break;
 
 	// --- RIGHT ---
     case 39: // Right
-		Right();
-    break;
     case 68: // d
+	case 76: // l
 		Right();
     break;
 
 	// --- UP ---
     case 38: // Up
-		Up();
-    break;
     case 87: // w
+	case 75: // k
 		Up();
     break;
 
 	// --- DOWN ---
     case 40: // Down
-		Down();
-    break;
     case 83: // s
+	case 74: // j
 		Down();
     break;
 
 	// --- A ---
-	case 96: // numpad 0
-		A();
-	break;
+	case 96:  // numpad 0
 	case 188: // ,
+	case 13:  // enter
 		A();
 	break;
 
 	// --- B ---
 	case 110: // numpad .
-		B();
-	break;
 	case 190: // period .
+	case 27:  // escape
 		B();
 	break;
   }
-  
-	cursor.context.setPosition();
-	
+  cursor.context.setPosition();
 }, false);
 
 // --- METHODS ---
@@ -587,7 +579,7 @@ var B = function() {
 		}
 	}
 }
-// ==========
+// === !Event handler ===
 
 
 
